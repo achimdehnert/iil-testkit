@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "iil-testkit"
-version = "0.2.0"
+version = "0.3.0"
 description = "Shared Test Factory Package for all Platform Django repos"
 readme = "README.md"
 license = { text = "MIT" }
