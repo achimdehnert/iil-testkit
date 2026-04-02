@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.3.0 (2026-04-02)
+
+### Added
+- **`iil_testkit.contract` module** — Platform-weiter Contract-Verifier (ADR-155)
+  - `ContractVerifier(cls)` — Klassen-API Contracts (Package-APIs, Service-Layer)
+  - `CallableContractVerifier(func)` — Freie Funktionen
+  - `TaskContractVerifier(task)` — Celery Task Signaturen (korrekte Introspection)
+  - `ResponseShapeVerifier(shape)` — REST API Response-Shapes
+  - `BaseContractVerifier` — Gemeinsame ABC-Basis
+- Factory Methods: `ContractVerifier.for_callable()`, `ContractVerifier.for_task()`
+- `assert_init_params(exhaustive=True)` — bidirektionale Parameterprüfung
+- `assert_raises()` — Exception-Docstring-Contracts (assert statt warnings.warn)
+- `assert_return_keys()` — Return-Shape-Contracts (assert statt warnings.warn)
+- `assert_return_origin()` — Generic Return-Type Prüfung
+- `assert_is_acks_late()` — Celery Platform-Standard Prüfung
+- 53 neue Tests für alle Verifier-Typen
+
 ## v0.2.0 (2026-03-10)
 
 ### Added
