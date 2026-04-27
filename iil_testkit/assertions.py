@@ -8,6 +8,7 @@ Usage:
     from iil_testkit.assertions import (
         assert_redirects_to_login,
         assert_htmx_response,
+        assert_data_testids,
         assert_no_n_plus_one,
         assert_form_error,
     )
@@ -22,6 +23,7 @@ if TYPE_CHECKING:
 __all__ = [
     "assert_redirects_to_login",
     "assert_htmx_response",
+    "assert_data_testids",
     "assert_no_n_plus_one",
     "assert_form_error",
 ]
@@ -72,9 +74,51 @@ def assert_htmx_response(response: HttpResponse, status_code: int = 200) -> None
     content = response.content.decode(errors="replace")
     for forbidden_tag in ("<html", "<head", "<body"):
         assert forbidden_tag not in content, (
-            f"HTMX partial must not contain full <html> page — "
+            f"HTMX partial must not contain full <html> page \u2014 "
             f"found {forbidden_tag!r} tag, a fragment was expected"
         )
+
+
+def assert_data_testids(response: HttpResponse, status_code: int = 200) -> None:
+    """Assert all HTMX interactive elements have data-testid attributes (ADR-048).
+
+    Parses the response HTML with BeautifulSoup and verifies that every element
+    with an hx-* attribute (hx-post, hx-get, hx-delete, hx-put, hx-patch) also
+    carries a data-testid attribute, as required by ADR-048.
+
+    Requires: pip install beautifulsoup4
+
+    Args:
+        response: Django test client response.
+        status_code: Expected HTTP status code (default: 200).
+
+    Example:
+        response = auth_client.get("/projects/")
+        assert_data_testids(response)
+    """
+    import pytest
+    pytest.importorskip("bs4", reason="beautifulsoup4 not installed — pip install beautifulsoup4")
+    from bs4 import BeautifulSoup
+
+    assert response.status_code == status_code, (
+        f"Expected status {status_code}, got {response.status_code}"
+    )
+    content = response.content.decode(errors="replace")
+    soup = BeautifulSoup(content, "html.parser")
+
+    _HTMX_ATTRS = ("hx-post", "hx-get", "hx-delete", "hx-put", "hx-patch")
+    violations: list[str] = []
+    for attr in _HTMX_ATTRS:
+        for el in soup.find_all(attrs={attr: True}):
+            if not el.get("data-testid"):
+                tag_repr = f"<{el.name} {attr}={el[attr]!r}>"
+                violations.append(tag_repr)
+
+    assert not violations, (
+        f"ADR-048: {len(violations)} HTMX element(s) missing data-testid:\n"
+        + "\n".join(f"  {v}" for v in violations)
+        + "\n\nFix: add data-testid=\"<name>\" to each listed element."
+    )
 
 
 def assert_no_n_plus_one(queries: list, threshold: int = 5) -> None:
@@ -113,7 +157,7 @@ def assert_form_error(response: HttpResponse, field: str, message: str) -> None:
         assert_form_error(response, "email", "required")
     """
     assert hasattr(response, "context") and response.context is not None, (
-        "Response has no context — ensure the view renders a template"
+        "Response has no context \u2014 ensure the view renders a template"
     )
     form = response.context.get("form")
     assert form is not None, "No 'form' found in response context"

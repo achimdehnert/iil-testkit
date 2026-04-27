@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "iil-testkit"
-version = "0.3.0"
+version = "0.4.0"
 description = "Shared Test Factory Package for all Platform Django repos"
 readme = "README.md"
 license = { text = "MIT" }
@@ -37,11 +37,17 @@ drf = [
     "djangorestframework>=3.14",
     "pytest-django>=4.8",
 ]
+smoke = [
+    "django>=4.2",
+    "pytest-django>=4.8",
+    "beautifulsoup4>=4.12",
+]
 dev = [
     "pytest>=8.0",
     "pytest-django>=4.8",
     "pytest-cov>=5.0",
     "django>=4.2",
+    "beautifulsoup4>=4.12",
     "ruff",
     "hatch",
     "mypy",

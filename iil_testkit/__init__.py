@@ -3,7 +3,7 @@
 See ADR-100 for architecture decisions.
 See ADR-155 for contract testing strategy.
 """
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 from iil_testkit.tenant_mixins import TenantTestMixin
 
