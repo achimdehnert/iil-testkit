@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.4.1 (2026-04-28)
+
+### Fixed
+- `plugin.py`: `iil_naming_mode` ini-Option via `parser.addini()` registrieren — behebt `ValueError: unknown configuration value` INTERNALERROR in pytest (trat auf wenn kein `iil_naming_mode` in pyproject.toml definiert war)
+
+---
+
 ## v0.3.0 (2026-04-02)
 
 ### Added
