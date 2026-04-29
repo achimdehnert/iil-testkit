@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.4.1] — 2026-04-29
+
+- **Added**
+  - Updated version to 0.4.1 in `pyproject.toml`.
+
+- **Changed**
+  - Revised workflow documentation files by replacing symlinks with regular files for better manageability and clarity.
+
+- **Fixed**
+  - No fixes were made in this version.
+
+
 ## v0.4.1 (2026-04-28)
 
 ### Fixed
