@@ -12,13 +12,21 @@ pip install iil-testkit
 
 In `requirements-test.txt`:
 ```
-iil-testkit>=0.2.0
+iil-testkit>=0.4.0
 ```
 
 With DRF support:
 ```
-iil-testkit[drf]>=0.2.0
+iil-testkit[drf]>=0.4.0
 ```
+
+## Extras / Optional Dependencies
+
+| Extra | Additional deps | Purpose |
+|---|---|---------|
+| `drf` | djangorestframework>=3.14 | DRF `APIClient` fixtures (`drf_api_client`, `drf_auth_client`) |
+| `django` | django>=4.2, pytest-django>=4.8 | Explicit Django pin (normally pulled transitively) |
+| `smoke` | django, beautifulsoup4>=4.12 | HTML smoke assertions |
 
 ## Quick Setup
 
