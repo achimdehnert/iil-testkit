@@ -26,6 +26,7 @@ description: Alle Workflows auf einen Blick — Trigger-Matrix, Entscheidungsbau
 | **Repo/Package Vollständigkeit prüfen** | **Repo Health Check** | **`/repo-health-check`** |
 | **Tests vor Package-Release prüfen** | **Testing Conventions** | **`/testing-conventions`** |
 | **Cross-Repo Audit (Schwachstellen, Inkonsistenzen)** | **Platform Audit** | **`/platform-audit`** |
+| **Workflows reviewen + optimieren (Agent-Stabilität)** | **Workflow Review** | **`/workflow-review`** |
 | Vor Production-Deploy | Deploy Check | `/deploy-check` |
 | Deployen | Deploy | `/deploy` |
 | DB-Backup | Backup | `/backup` |
@@ -242,6 +243,9 @@ Cross-Repo Schwachstellen-Analyse: Scannt ALLE 7 Repos + Infrastruktur. 5 Phasen
     → T-01: pytest.importorskip() für opt. Deps
     → T-02: AsyncMock(side_effect=) statt wraps=
     → T-03: pytest.raises() für Exception-Contracts
+13. Branch Protection: qm-gate als required status check in main (ADR-174, alle Repos)
+    → "Do not allow bypassing" aktivieren
+    → Setup via /onboard-repo Step 6.9
 ```
 
 ---
