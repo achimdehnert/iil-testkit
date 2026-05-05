@@ -188,32 +188,42 @@ fi
 
 ## Phase 2: pgvector Memory schreiben (ADR-154)
 
+> **MCP-Prefix beachten** — auf Dev Desktop ist `mcp1_` = orchestrator (siehe `project-facts.md`).
+
 7. **Session-Summary in pgvector speichern:**
 ```
-mcp2_agent_memory_upsert(
-  entry_key: "session:<YYYY-MM-DD>:<repo>",
-  entry_type: "context",
-  title: "Session <date> — <repo>: <1-Zeile Summary>",
-  content: "<Was wurde erledigt, welche Entscheidungen, welche Dateien>",
-  tags: ["session", "<repo>", "<task-type>"]
+mcp1_agent_memory(
+  operation: "upsert",
+  agent: "cascade",
+  entry: {
+    entry_id: "SESSION-<YYYYMMDD>-<REPO-UPPERCASE>",  // muss [A-Z][A-Z0-9\-]+ matchen
+    entry_type: "solved_problem",                    // enum: solved_problem|repo_context|open_task|agent_decision|error_pattern
+    agent: "cascade",
+    title: "Session <date> — <repo>: <1-Zeile Summary>",
+    content: "<Was wurde erledigt, welche Entscheidungen, welche Dateien>",
+    tags: ["session", "<repo>", "<task-type>"]
+  }
 )
 ```
 
-8. **Error-Patterns erfassen** (nur bei Bug-Fixes in dieser Session):
+8. **Error-Patterns erfassen** (nur bei Bug-Fixes — als `error_pattern` Memory-Entry):
 ```
-mcp2_log_error_pattern(
-  repo: "<repo>",
-  symptom: "<Was ging schief?>",
-  root_cause: "<Warum?>",
-  fix: "<Was wurde gefixt?>",
-  prevention: "<Wie vermeiden?>"
+mcp1_agent_memory(
+  operation: "upsert",
+  agent: "cascade",
+  entry: {
+    entry_id: "ERROR-<YYYYMMDD>-<REPO>-<SHORTID>",
+    entry_type: "error_pattern",
+    agent: "cascade",
+    title: "<symptom 1-Zeile>",
+    content: "Repo: <repo>\nSymptom: ...\nRoot Cause: ...\nFix: ...\nPrevention: ...",
+    tags: ["error", "<repo>"]
+  }
 )
 ```
 
-9. **Session-Stats prüfen** (optional, 1x pro Woche):
-```
-mcp2_session_stats(days: 7)
-```
+> ℹ️ Die früheren Tools `mcp2_log_error_pattern` / `mcp2_session_stats` / `mcp2_check_recurring_errors`
+> existieren nicht mehr (Issue #80) — Pattern-Erkennung jetzt via `mcp1_agent_memory(operation: "query")`.
 
 ---
 
@@ -326,30 +336,11 @@ mcp1_push_files(owner: "achimdehnert", repo: "<repo>", branch: "main",
 
 ---
 
-## Checkliste (muss alles grün sein)
 
-| # | Check | Status |
-|---|-------|--------|
-| 1 | Outline-Dokument geschrieben/aktualisiert | ☐ |
-| 2 | pgvector Session-Summary gespeichert | ☐ |
-| 3 | Error-Patterns erfasst (falls Bug-Fix) | ☐ |
-| 4 | Alle Repos committed + pushed | ☐ |
-| 5 | Platform gepusht → Workflows sync → project-facts aktuell | ☐ |
-| 6 | Kein Repo dirty | ☐ |
-| 7 | Keine .fixed/.updated Dateien übrig | ☐ |
-| 8 | Blockierte Arbeit dokumentiert | ☐ |
-| 9 | Docu-Drift-Check: Issue erstellt falls nötig (Phase 1b) | ☐ |
-| 10 | Template-Drift-Check: Error-Drifts gefixt (Phase 1c) | ☐ |
+## Abschluss-Checkliste + MCP-Reference
 
----
+→ **[`docs/governance/session-ende-checklist.md`](../../docs/governance/session-ende-checklist.md)**
 
-## MCP-Server Quick-Reference (aktuell)
-
-| Prefix | Server | Zweck |
-|--------|--------|-------|
-| `mcp0_` | deployment-mcp | SSH, Docker, Git, DB, DNS, SSL, System |
-| `mcp1_` | github | Issues, PRs, Repos, Files, Reviews |
-| `mcp2_` | orchestrator | Task-Analyse, Agent-Team, Tests, Lint, Memory |
-| `mcp3_` | outline-knowledge | Wiki: Runbooks, Konzepte, Lessons |
-| `mcp4_` | paperless-docs | Dokumente, Rechnungen |
-| `mcp5_` | platform-context | Architektur-Regeln, ADR-Compliance |
+Inhalte:
+- 10-Punkte-Checkliste (Outline, Memory, Repos, Sync, Cleanup)
+- MCP-Server Quick-Reference (Dev Desktop + WSL/Prod, korrekt nach 2026-04-29 Update)
