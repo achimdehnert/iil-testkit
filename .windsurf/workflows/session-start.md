@@ -202,16 +202,8 @@ mcp0_ssh_manage:
   command: "for repo in risk-hub billing-hub cad-hub coach-hub trading-hub travel-beat weltenhub wedding-hub pptx-hub; do bash /opt/deploy-core/deploy-status.sh $repo 2>/dev/null; done"
 ```
 
-→ Für jedes Repo mit `"status":"FAILED"`: Deploy-Log lesen und Error Pattern loggen:
-```
-mcp2_log_error_pattern:
-  repo: <repo>
-  symptom: "Deploy FAILED: <aus Log>"
-  root_cause: "<Analyse>"
-  fix: "<empfohlener Fix>"
-  error_type: deploy
-```
-→ User über fehlgeschlagene Deploys informieren, bevor an anderen Tasks gearbeitet wird.
+→ Für jedes Repo mit `"status":"FAILED"`: Deploy-Log lesen und User informieren.
+→ Optional als Memory-Entry sichern (siehe `/session-ende` Phase 2 — `error_pattern`).
 
 ### 0.8 Staging-Health-Check (ADR-157)
 
@@ -222,7 +214,9 @@ Prüfe ob Staging-Services auf Dev Desktop (88.99.38.75) erreichbar sind:
 python -c "
 import yaml, urllib.request, socket
 from pathlib import Path
-d = yaml.safe_load(Path('$HOME/github/platform/infra/ports.yaml').read_text())
+import os
+gh = os.environ.get('GITHUB_DIR') or f\"{os.environ['HOME']}/CascadeProjects\"
+d = yaml.safe_load(Path(f'{gh}/platform/infra/ports.yaml').read_text())
 ok = fail = skip = 0
 for name, cfg in sorted(d.get('services',{}).items()):
     if not cfg or not cfg.get('staging'): continue
@@ -261,32 +255,61 @@ mcp3_search_knowledge(query: "Input ADR", collection: null, limit: 10)
 
 ## Phase 2: pgvector Warm-Start (ADR-154)
 
-8. **Memory Warm-Start** — Relevante Memories aus früheren Sessions laden:
+> **MCP-Prefix beachten** — auf Dev Desktop ist `mcp1_` = orchestrator (siehe `project-facts.md`).
+
+8. **Memory Warm-Start / Bekannte Fehler / Recurring Errors** — alles über `mcp1_agent_memory`:
 ```
-mcp2_agent_memory_context(
-  task_description: "<User-Aufgabe aus erster Nachricht>",
-  top_k: 5
+mcp1_agent_memory(
+  operation: "query",
+  filter_type: "solved_problem",   // oder "error_pattern" für Bug-Fix-Sessions
+  filter_tag: "<repo>"             // optional
 )
 ```
-→ Zeigt relevante Session-Summaries, Error-Patterns und Lessons.
+→ Liefert relevante Session-Summaries, Error-Patterns und Lessons aus pgvector.
 → Falls leer: normal weiterarbeiten (Memory füllt sich über `/session-ende`).
 
-9. **Delta-Check** — Was hat sich seit der letzten Session geändert?
+> ℹ️ `mcp2_get_session_delta` + `mcp2_find_similar_errors` + `mcp2_check_recurring_errors`
+> sind wieder verfügbar (seit Issue #80 Reopened). Siehe Phase 2.5.
+
+---
+
+## Phase 2.5: Error-Learning (Recurring Errors → ADR-Kandidaten)
+
+**Proaktives Root-Cause-Scanning** — Fehler die sich 3×+ wiederholen sind strukturell, nicht zufällig.
+
 ```
-mcp2_get_session_delta()
+MCP: <orc>_check_recurring_errors(threshold=3)
+→ liefert: Liste mit {symptom, root_cause, fix, occurrence_count, last_occurred_at, action}
 ```
 
-10. **Bekannte Fehler prüfen** (bei Bug-Fix-Sessions):
+**Auswertungs-Regeln:**
+
+| Occurrences | Action | Automatik |
+|------------|--------|-----------|
+| 3-4× | 🟡 ESCALATED | User am Session-Start informieren, Fix-Hypothese vorschlagen |
+| 5-9× | 🔴 CRITICAL | **Auto-Issue** mit Label `adr-candidate` erstellen (wenn noch nicht offen) |
+| 10×+ | 🚨 BLOCKER | Session stoppen, User-Approval holen bevor weitergemacht wird |
+
+**Auto-Issue-Template** (für 5×+ Occurrences):
+
 ```
-mcp2_find_similar_errors(query: "<Fehlerbeschreibung>", repo: "<aktuelles Repo>")
+<gh>_list_issues(labels=["adr-candidate", "auto-detected"], state="open")
+# Nur erstellen wenn gleiche entry_key nicht schon offen
+
+<gh>_create_issue(
+    owner="achimdehnert", repo="platform",
+    title=f"[adr-candidate] Recurring: {symptom[:60]}",
+    body=f"**Occurrences:** {count}× (seit {first_seen})\n"
+         f"**Last:** {last_occurred_at}\n\n"
+         f"**Symptom:** {symptom}\n"
+         f"**Root Cause:** {root_cause}\n"
+         f"**Bisheriger Fix:** {fix}\n\n"
+         f"→ Fix löst Symptom, nicht Root Cause. ADR für strukturelle Lösung nötig.",
+    labels=["adr-candidate", "auto-detected", "agent-learning"]
+)
 ```
 
-11. **Wiederkehrende Fehler prüfen** (automatisch, jede Session):
-```
-mcp2_check_recurring_errors()
-```
-→ 🟡 ESCALATED (3-5x): nachhaltige Lösung untersuchen.
-→ 🔴 CRITICAL (≥6x): sofortige Analyse, Blocker für andere Tasks.
+**Status-RESOLVED Filter:** Tags mit `resolved` aus Output filtern (bereits behobene Patterns).
 
 ---
 
@@ -296,13 +319,24 @@ mcp2_check_recurring_errors()
 
 ---
 
-## MCP-Server Quick-Reference (aktuell)
+## MCP-Server Quick-Reference
+
+> ⚠️ **Prefix ist environment-spezifisch** — immer `project-facts.md` als Quelle nehmen!
+
+### Dev Desktop (adehnert@dev-desktop)
+
+| Prefix | Server | Zweck |
+|--------|--------|-------|
+| `mcp0_` | github | Issues, PRs, Repos, Files, Reviews |
+| `mcp1_` | orchestrator | Memory, Task-Analyse, Plans, Evaluate, Verify |
+
+### WSL / Prod-Server (Standard-Konfiguration)
 
 | Prefix | Server | Zweck |
 |--------|--------|-------|
 | `mcp0_` | deployment-mcp | SSH, Docker, Git, DB, DNS, SSL, System |
 | `mcp1_` | github | Issues, PRs, Repos, Files, Reviews |
-| `mcp2_` | orchestrator | Task-Analyse, Agent-Team, Tests, Lint, Memory |
+| `mcp2_` | orchestrator | Memory, Task-Analyse, Agent-Team |
 | `mcp3_` | outline-knowledge | Wiki: Runbooks, Konzepte, Lessons |
 | `mcp4_` | paperless-docs | Dokumente, Rechnungen |
 | `mcp5_` | platform-context | Architektur-Regeln, ADR-Compliance |
