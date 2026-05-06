@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "iil-testkit"
-version = "0.4.1"
+version = "0.5.0"
 description = "Shared Test Factory Package for all Platform Django repos"
 readme = "README.md"
 license = { text = "MIT" }
@@ -58,10 +58,10 @@ dev = [
 iil-testkit = "iil_testkit.plugin"
 
 [project.urls]
-Homepage = "https://github.com/achimdehnert/testkit"
-Repository = "https://github.com/achimdehnert/testkit"
-Issues = "https://github.com/achimdehnert/testkit/issues"
-Changelog = "https://github.com/achimdehnert/testkit/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/achimdehnert/iil-testkit"
+Repository = "https://github.com/achimdehnert/iil-testkit"
+Issues = "https://github.com/achimdehnert/iil-testkit/issues"
+Changelog = "https://github.com/achimdehnert/iil-testkit/blob/main/CHANGELOG.md"
 
 [tool.hatch.version]
 path = "iil_testkit/__init__.py"
