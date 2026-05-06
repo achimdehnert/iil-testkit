@@ -2,6 +2,10 @@ name: Publish to PyPI
 
 on:
   push:
+    branches: [main]
+    paths:
+      - "iil_testkit/__init__.py"
+      - "pyproject.toml"
     tags:
       - "v*"
   workflow_dispatch:
@@ -16,9 +20,44 @@ on:
           - testpypi
 
 jobs:
+  check-version:
+    name: Check if version changed
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.check.outputs.changed }}
+      version: ${{ steps.check.outputs.version }}
+    if: github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect version change
+        id: check
+        run: |
+          CURR=$(python3 -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          PREV=$(git show HEAD~1:pyproject.toml 2>/dev/null | python3 -c "import tomllib,sys; print(tomllib.load(sys.stdin.buffer)['project']['version'])" 2>/dev/null || echo "0.0.0")
+          echo "Current: $CURR, Previous: $PREV"
+          if [ "$CURR" != "$PREV" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "version=$CURR" >> "$GITHUB_OUTPUT"
+            echo "Version changed: $PREV → $CURR"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "version=$CURR" >> "$GITHUB_OUTPUT"
+            echo "No version change"
+          fi
+
   test:
     name: Tests (publish gate)
     runs-on: ubuntu-latest
+    needs: [check-version]
+    if: |
+      always() && (
+        (needs.check-version.result == 'success' && needs.check-version.outputs.changed == 'true') ||
+        (needs.check-version.result == 'skipped') ||
+        github.event_name == 'workflow_dispatch'
+      )
     steps:
       - uses: actions/checkout@v4
 
@@ -38,6 +77,7 @@ jobs:
   build:
     name: Build distribution
     runs-on: ubuntu-latest
+    needs: [test]
     outputs:
       version: ${{ steps.meta.outputs.version }}
     steps:
@@ -76,7 +116,7 @@ jobs:
     needs: [test, build]
     runs-on: ubuntu-latest
     if: |
-      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) ||
+      (github.event_name == 'push') ||
       (github.event_name == 'workflow_dispatch' && (github.event.inputs.target == 'pypi' || github.event.inputs.target == ''))
     steps:
       - name: Download dist artifacts
