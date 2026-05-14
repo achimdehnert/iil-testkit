@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.5.2] — 2026-05-14
+
+- **Fixed**
+  - `pyproject.toml` `[tool.pytest.ini_options]`: set `iil_naming_mode = "warn"` (was `"error"`) and `iil_repo_type = "package"` so the testkit's own test suite — which pre-dates the `test_should_*` convention introduced in 0.5.0 — can be collected. Without this, the publish-gate `pytest` step bailed with `no tests ran` (exit 4), blocking the 0.5.1 publish. Downstream consumers are unaffected: they keep their own per-repo `iil_naming_mode` setting.
+
 ## [0.5.1] — 2026-05-14
 
 - **Fixed**

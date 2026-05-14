@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "iil-testkit"
-version = "0.5.1"
+version = "0.5.2"
 description = "Shared Test Factory Package for all Platform Django repos"
 readme = "README.md"
 license = { text = "MIT" }
@@ -88,7 +88,12 @@ known-first-party = ["iil_testkit"]
 DJANGO_SETTINGS_MODULE = "tests.settings"
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
-iil_naming_mode = "error"
+# iil-testkit is itself a package (not an MCP), and its own tests pre-date the
+# `test_should_*` convention introduced in 0.5.0. Keep the plugin in warn-mode
+# for self-tests so collection doesn't abort; downstream consumers can still
+# opt into "error" via their own pyproject.toml.
+iil_naming_mode = "warn"
+iil_repo_type = "package"
 addopts = "--cov=iil_testkit --cov-report=term-missing --cov-fail-under=80"
 
 [tool.coverage.run]
