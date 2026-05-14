@@ -5,7 +5,6 @@ Covers all 5 verifier types and all review fixes (B1-B4, K1, K3, M3).
 """
 from __future__ import annotations
 
-import inspect
 from typing import Any
 
 import pytest

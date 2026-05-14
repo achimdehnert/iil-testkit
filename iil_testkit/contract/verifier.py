@@ -26,7 +26,8 @@ from __future__ import annotations
 
 import inspect
 from abc import ABC, abstractmethod
-from typing import Any, Callable, TypeVar, get_type_hints
+from collections.abc import Callable
+from typing import Any, TypeVar, get_type_hints
 
 _T = TypeVar("_T")
 
@@ -75,12 +76,12 @@ class ContractVerifier(BaseContractVerifier):
     # ── Factory Methods ───────────────────────────────────────────────────────
 
     @classmethod
-    def for_callable(cls, func: Callable[..., Any]) -> "CallableContractVerifier":
+    def for_callable(cls, func: Callable[..., Any]) -> CallableContractVerifier:
         """Erstellt einen Verifier für eine freistehende Funktion."""
         return CallableContractVerifier(func)
 
     @classmethod
-    def for_task(cls, task: Any) -> "TaskContractVerifier":
+    def for_task(cls, task: Any) -> TaskContractVerifier:
         """Erstellt einen Verifier für einen Celery Task (alle Task-Typen)."""
         return TaskContractVerifier(task)
 
@@ -210,7 +211,7 @@ class ContractVerifier(BaseContractVerifier):
             )
 
             # Fix B2: assert statt warnings.warn
-            assert f":raises {exc_name}:" in docstring or f"Raises:" in docstring, (
+            assert f":raises {exc_name}:" in docstring or "Raises:" in docstring, (
                 f"{self._name}.{method_name}: Exception '{exc_name}' nicht im Docstring "
                 f"dokumentiert. Erwartet ':raises {exc_name}: <Beschreibung>' "
                 f"oder Google-Style 'Raises:' Block.\n"
@@ -233,7 +234,8 @@ class ContractVerifier(BaseContractVerifier):
         """
         method = self._get_method(method_name)
 
-        # Nutze get_type_hints für aufgelöste Annotations (korrekt für from __future__ import annotations)
+        # Use get_type_hints for resolved annotations (correct under
+        # `from __future__ import annotations`)
         try:
             hints = get_type_hints(method)
         except Exception:
@@ -252,9 +254,12 @@ class ContractVerifier(BaseContractVerifier):
         )
 
         # Fix B1: Direkter Vergleich ohne __origin__-Short-Circuit
+        expected_name = (
+            expected_type.__name__ if hasattr(expected_type, "__name__") else repr(expected_type)
+        )
         assert annotation == expected_type, (
             f"{self._name}.{method_name}: Return-Typ {annotation!r} ≠ erwartet {expected_type!r}. "
-            f"Consumer erwartet {expected_type.__name__ if hasattr(expected_type, '__name__') else expected_type!r}."
+            f"Consumer erwartet {expected_name}."
         )
 
     def assert_return_origin(self, method_name: str, expected_origin: type) -> None:
@@ -560,7 +565,7 @@ class ResponseShapeVerifier:
             if k in actual and not isinstance(actual[k], t)
         ]
         assert not type_errors, (
-            f"Response-Type-Mismatch:\n" + "\n".join(type_errors)
+            "Response-Type-Mismatch:\n" + "\n".join(type_errors)
         )
 
     def assert_status_code(self, response: Any, expected: int) -> None:

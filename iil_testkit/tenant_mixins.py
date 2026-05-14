@@ -15,7 +15,7 @@ Usage:
 """
 from __future__ import annotations
 
-from typing import Any, Optional, Type
+from typing import Any
 
 from django.http import HttpRequest
 from django.test import RequestFactory
@@ -29,7 +29,7 @@ class TenantTestMixin:
     Add 'django_tenancy' to INSTALLED_APPS in your test settings.
     """
 
-    _rf: Optional[RequestFactory] = None
+    _rf: RequestFactory | None = None
 
     @property
     def _request_factory(self) -> RequestFactory:
@@ -109,7 +109,7 @@ class TenantTestMixin:
 
     def assert_tenant_isolated(
         self,
-        model_class: Type[Any],
+        model_class: type[Any],
         obj: Any,
         other_tenant: Any,
     ) -> None:
@@ -131,7 +131,7 @@ class TenantTestMixin:
 
     def assert_tenant_visible(
         self,
-        model_class: Type[Any],
+        model_class: type[Any],
         obj: Any,
         tenant: Any,
     ) -> None:
