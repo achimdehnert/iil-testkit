@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.5.3] — 2026-05-14
+
+- **Fixed**
+  - `tests/test_tenant_mixins.py::test_set_tenant_updates_session`: replace bare-dict session mock with `MagicMock.side_effect` so `.save()` is callable. Latent test bug from before 0.5.0 that the naming-mode-error abort had been hiding. Bump version so the publish workflow re-triggers (previous 0.5.2 run failed at the test gate on this same case).
+
 ## [0.5.2] — 2026-05-14
 
 - **Fixed**
