@@ -104,10 +104,11 @@ class TestTenantTestMixinUnit:
         tenant = MagicMock()
         tenant.pk = 7
         client = MagicMock()
-        session = {}
-        client.session = session
+        captured: dict = {}
+        client.session.__setitem__.side_effect = captured.__setitem__
+        client.session.__getitem__.side_effect = captured.__getitem__
         mixin.set_tenant(client, tenant)
-        assert session["tenant_id"] == 7
+        assert captured["tenant_id"] == 7
         client.session.save.assert_called_once()
 
     def test_request_factory_is_lazily_created(self):
