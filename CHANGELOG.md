@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.5.1] — 2026-05-14
+
+- **Fixed**
+  - `__init__.py`: lazy-load `TenantTestMixin` via module-level `__getattr__`. The previous eager `from iil_testkit.tenant_mixins import TenantTestMixin` pulled `django.http.HttpRequest` on plain `import iil_testkit`, which broke pytest startup in non-Django consumers (MCP packages) that load this package via the `pytest11` entry-point. Importing the package no longer requires Django; only accessing `iil_testkit.TenantTestMixin` does.
+
 ## [0.4.1] — 2026-04-29
 
 - **Added**
