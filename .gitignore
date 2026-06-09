@@ -3,3 +3,9 @@ env_loader.py
 # IDE agent workflows (symlinked, not repo-specific)
 .windsurf/
 .windsurfignore
+
+# Python bytecode + coverage artifacts
+__pycache__/
+*.py[cod]
+.coverage
+.coverage.*
