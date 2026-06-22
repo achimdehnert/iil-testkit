@@ -17,7 +17,6 @@ classifiers = [
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Topic :: Software Development :: Testing",
     "Typing :: Typed",
@@ -63,15 +62,12 @@ Repository = "https://github.com/achimdehnert/iil-testkit"
 Issues = "https://github.com/achimdehnert/iil-testkit/issues"
 Changelog = "https://github.com/achimdehnert/iil-testkit/blob/main/CHANGELOG.md"
 
-[tool.hatch.version]
-path = "iil_testkit/__init__.py"
-
 [tool.hatch.build.targets.wheel]
 packages = ["iil_testkit"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py311"
+target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]
@@ -106,6 +102,6 @@ fail_under = 80
 omit = ["iil_testkit/contrib/*"]
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.12"
 strict = false
 ignore_missing_imports = true
