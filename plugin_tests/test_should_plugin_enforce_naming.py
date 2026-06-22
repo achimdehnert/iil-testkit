@@ -1,6 +1,7 @@
 # plugin_tests/test_should_plugin_enforce_naming.py
 # Uses pytester to test the iil_testkit naming convention plugin
 # in a completely isolated subprocess (no Django context).
+import pytest
 
 
 def test_should_pass_for_correctly_named_test(pytester):
@@ -12,7 +13,7 @@ iil_naming_mode = "error"
 def test_should_do_something():
     assert True
 """)
-    result = pytester.runpytest("--relax-naming")
+    result = pytester.runpytest("-p", "iil_testkit.plugin", "--relax-naming")
     result.assert_outcomes(passed=1)
 
 
@@ -25,8 +26,11 @@ iil_naming_mode = "error"
 def test_bad_name():
     assert True
 """)
-    result = pytester.runpytest()
-    result.assert_outcomes(errors=1)
+    result = pytester.runpytest("-p", "iil_testkit.plugin")
+    # error mode raises pytest.UsageError → the session aborts before any test
+    # runs (no per-test outcomes), exiting with USAGE_ERROR.
+    assert result.ret == pytest.ExitCode.USAGE_ERROR
+    result.stderr.fnmatch_lines(["*Naming convention violations*"])
 
 
 def test_should_warn_for_non_conforming_name_in_warn_mode(pytester):
@@ -38,7 +42,7 @@ iil_naming_mode = "warn"
 def test_bad_name():
     assert True
 """)
-    result = pytester.runpytest()
+    result = pytester.runpytest("-p", "iil_testkit.plugin")
     result.assert_outcomes(passed=1)
 
 
@@ -51,7 +55,7 @@ iil_naming_mode = "error"
 def test_bad_name():
     assert True
 """)
-    result = pytester.runpytest("--relax-naming")
+    result = pytester.runpytest("-p", "iil_testkit.plugin", "--relax-naming")
     result.assert_outcomes(passed=1)
 
 
@@ -67,5 +71,5 @@ import pytest
 def test_legacy_name():
     assert True
 """)
-    result = pytester.runpytest()
+    result = pytester.runpytest("-p", "iil_testkit.plugin")
     result.assert_outcomes(passed=1)
