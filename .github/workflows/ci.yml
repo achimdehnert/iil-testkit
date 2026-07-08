@@ -25,4 +25,4 @@ jobs:
       test_path: 'tests/'
       pytest_args: '--ignore=tests/plugin'
       enable_mypy: true
-      mypy_args: 'iil_testkit/ --ignore-missing-imports'
+      mypy_args: 'iil_testkit/'

@@ -4,6 +4,7 @@ tests/test_tenant_mixins.py
 Unit tests for TenantTestMixin.
 Requires django_tenancy in INSTALLED_APPS (see tests/settings.py).
 """
+
 import pytest
 from unittest.mock import MagicMock
 from iil_testkit.tenant_mixins import TenantTestMixin
@@ -13,12 +14,14 @@ from iil_testkit.tenant_mixins import TenantTestMixin
 # Pure unit tests (no DB) — mock Organization
 # ---------------------------------------------------------------------------
 
+
 class TestTenantTestMixinUnit:
     """Unit tests using mocks — no DB required."""
 
     def _make_mixin(self) -> TenantTestMixin:
         class Concrete(TenantTestMixin):
             pass
+
         return Concrete()
 
     def test_make_tenant_request_no_tenant(self):

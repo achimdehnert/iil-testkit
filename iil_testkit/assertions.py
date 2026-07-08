@@ -13,6 +13,7 @@ Usage:
         assert_form_error,
     )
 """
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -49,6 +50,7 @@ def assert_redirects_to_login(response: HttpResponse, next_url: str | None = Non
     )
     if next_url is not None:
         from urllib.parse import quote
+
         assert quote(next_url, safe="") in location or next_url in location, (
             f"Expected next={next_url!r} in redirect Location, got: {location!r}"
         )
@@ -97,6 +99,7 @@ def assert_data_testids(response: HttpResponse, status_code: int = 200) -> None:
         assert_data_testids(response)
     """
     import pytest
+
     pytest.importorskip("bs4", reason="beautifulsoup4 not installed — pip install beautifulsoup4")
     from bs4 import BeautifulSoup
 
@@ -117,7 +120,7 @@ def assert_data_testids(response: HttpResponse, status_code: int = 200) -> None:
     assert not violations, (
         f"ADR-048: {len(violations)} HTMX element(s) missing data-testid:\n"
         + "\n".join(f"  {v}" for v in violations)
-        + "\n\nFix: add data-testid=\"<name>\" to each listed element."
+        + '\n\nFix: add data-testid="<name>" to each listed element.'
     )
 
 
@@ -161,9 +164,7 @@ def assert_form_error(response: HttpResponse, field: str, message: str) -> None:
     )
     form = response.context.get("form")
     assert form is not None, "No 'form' found in response context"
-    assert field in form.errors, (
-        f"Field {field!r} has no errors. Errors: {dict(form.errors)}"
-    )
+    assert field in form.errors, f"Field {field!r} has no errors. Errors: {dict(form.errors)}"
     error_messages = " ".join(str(e) for e in form.errors[field])
     assert message in error_messages, (
         f"Expected {message!r} in errors for field {field!r}, got: {error_messages!r}"

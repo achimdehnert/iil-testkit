@@ -21,6 +21,7 @@ Opt-out naming globally:
 Note: "error" mode uses pytest.UsageError (not pytest.fail) to avoid
 INTERNALERROR in pytest_collection_modifyitems.
 """
+
 from __future__ import annotations
 
 import warnings
@@ -126,8 +127,7 @@ def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
     mandatory = MANDATORY_MARKERS.get(repo_type)
     if mandatory is None:
         warnings.warn(
-            f"iil-testkit: unknown iil_repo_type='{repo_type}'. "
-            f"Valid: {list(MANDATORY_MARKERS)}",
+            f"iil-testkit: unknown iil_repo_type='{repo_type}'. Valid: {list(MANDATORY_MARKERS)}",
             stacklevel=1,
         )
         return

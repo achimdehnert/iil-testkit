@@ -8,6 +8,7 @@ This module is intentionally NOT auto-imported by iil_testkit.factories.
 Importing it in a repo without 'tenants' in INSTALLED_APPS will raise
 a clear RuntimeError at *use time* (not at import time).
 """
+
 import factory
 
 __all__ = ["TenantFactory"]

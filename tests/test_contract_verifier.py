@@ -3,6 +3,7 @@ Tests for iil_testkit.contract.verifier — ADR-155 Contract Testing.
 
 Covers all 5 verifier types and all review fixes (B1-B4, K1, K3, M3).
 """
+
 from __future__ import annotations
 
 from typing import Any
@@ -65,6 +66,7 @@ def free_function_no_annotation(text):
 
 class FakeCeleryTask:
     """Simuliert einen Celery Task mit .run-Methode."""
+
     name = "app.tasks.fake_task"
     acks_late = True
 

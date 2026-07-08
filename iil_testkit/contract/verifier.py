@@ -22,6 +22,7 @@ Korrekturen gegenüber ADR-v2:
 
 ADR: ADR-155
 """
+
 from __future__ import annotations
 
 import inspect
@@ -341,10 +342,7 @@ class ContractVerifier(BaseContractVerifier):
         params = sig.parameters
 
         # Alle Parameter ohne self/cls
-        actual = [
-            name for name, p in params.items()
-            if name not in ("self", "cls")
-        ]
+        actual = [name for name, p in params.items() if name not in ("self", "cls")]
 
         # Richtung 1: Consumer erwartet Parameter die nicht existieren
         missing = [p for p in expected if p not in actual]
@@ -357,10 +355,12 @@ class ContractVerifier(BaseContractVerifier):
         # Richtung 2 (Fix K1): Provider hat neue Required-Params die Consumer nicht übergibt
         if exhaustive:
             required_in_provider = [
-                name for name, p in params.items()
+                name
+                for name, p in params.items()
                 if name not in ("self", "cls")
                 and p.default is inspect.Parameter.empty
-                and p.kind not in (
+                and p.kind
+                not in (
                     inspect.Parameter.VAR_POSITIONAL,
                     inspect.Parameter.VAR_KEYWORD,
                 )
@@ -403,8 +403,7 @@ class CallableContractVerifier(BaseContractVerifier):
         actual = [p for p in sig.parameters.keys() if p not in ("self", "cls")]
         missing = [p for p in expected if p not in actual]
         assert not missing, (
-            f"{self._name}(): Fehlende Parameter: {missing}. "
-            f"Tatsächliche Signatur: {actual}."
+            f"{self._name}(): Fehlende Parameter: {missing}. Tatsächliche Signatur: {actual}."
         )
 
     def assert_no_param(self, wrong_name: str) -> None:
@@ -564,13 +563,9 @@ class ResponseShapeVerifier:
             for k, t in self._shape.items()
             if k in actual and not isinstance(actual[k], t)
         ]
-        assert not type_errors, (
-            "Response-Type-Mismatch:\n" + "\n".join(type_errors)
-        )
+        assert not type_errors, "Response-Type-Mismatch:\n" + "\n".join(type_errors)
 
     def assert_status_code(self, response: Any, expected: int) -> None:
         """Prüft HTTP Status-Code (kompatibel mit Django test client + requests)."""
         actual = getattr(response, "status_code", None)
-        assert actual == expected, (
-            f"HTTP Status {actual} ≠ erwartet {expected}."
-        )
+        assert actual == expected, f"HTTP Status {actual} ≠ erwartet {expected}."
