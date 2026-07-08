@@ -24,6 +24,7 @@ Usage (ViewSmokeTester mixin):
     def test_should_all_views_load(self, auth_client):
         self.run_smoke(auth_client)
 """
+
 from __future__ import annotations
 
 import re
@@ -146,6 +147,5 @@ class ViewSmokeTester:
                 failures.append(f"  {url}  → HTTP {response.status_code}")
 
         assert not failures, (
-            f"Smoke test failures ({len(failures)}/{len(urls)} URLs):\n"
-            + "\n".join(failures)
+            f"Smoke test failures ({len(failures)}/{len(urls)} URLs):\n" + "\n".join(failures)
         )

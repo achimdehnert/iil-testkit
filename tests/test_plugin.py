@@ -27,6 +27,7 @@ def _make_config(mode="error", relax=False):
 # marker + ini registration (via pytestconfig)
 # ---------------------------------------------------------------------------
 
+
 def test_should_register_no_naming_convention_marker(pytestconfig):
     ini_lines = pytestconfig.getini("markers")
     assert any("no_naming_convention" in line for line in ini_lines)
@@ -45,6 +46,7 @@ def test_should_read_iil_naming_mode_ini(pytestconfig):
 # ---------------------------------------------------------------------------
 # pytest_collection_modifyitems — direct unit tests
 # ---------------------------------------------------------------------------
+
 
 def test_should_pass_for_correctly_named_item():
     config = _make_config(mode="error", relax=False)

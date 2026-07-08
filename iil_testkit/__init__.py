@@ -20,6 +20,7 @@ See ADR-155 for contract testing strategy.
 
 ``__version__`` is resolved from the installed package metadata.
 """
+
 from __future__ import annotations
 
 from importlib.metadata import PackageNotFoundError, version
@@ -41,5 +42,6 @@ def __getattr__(name: str):
     # eagerly pull in django via iil_testkit.tenant_mixins.
     if name == "TenantTestMixin":
         from iil_testkit.tenant_mixins import TenantTestMixin
+
         return TenantTestMixin
     raise AttributeError(f"module 'iil_testkit' has no attribute {name!r}")

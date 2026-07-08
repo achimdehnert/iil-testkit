@@ -13,6 +13,7 @@ Usage:
             self.assert_tenant_isolated(MyModel, obj, t2)
             self.assert_tenant_visible(MyModel, obj, t1)
 """
+
 from __future__ import annotations
 
 from typing import Any

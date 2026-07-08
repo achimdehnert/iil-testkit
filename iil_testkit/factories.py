@@ -9,6 +9,7 @@ Public API:
 For TenantFactory see: iil_testkit.contrib.tenants
 (only import if your repo has the 'tenants' app installed)
 """
+
 import factory
 from django.contrib.auth import get_user_model
 

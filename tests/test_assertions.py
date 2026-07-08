@@ -13,6 +13,7 @@ from iil_testkit.assertions import (
 # assert_no_n_plus_one
 # ---------------------------------------------------------------------------
 
+
 def test_should_pass_when_queries_within_threshold():
     assert_no_n_plus_one(list(range(3)), threshold=5)
 
@@ -40,8 +41,10 @@ def test_should_include_threshold_in_n_plus_one_message():
 # assert_htmx_response
 # ---------------------------------------------------------------------------
 
+
 class _Response:
     """Minimal fake response for assertion tests."""
+
     def __init__(self, content: bytes, status_code: int = 200):
         self.content = content
         self.status_code = status_code
@@ -83,8 +86,10 @@ def test_should_pass_for_custom_expected_status_code():
 # assert_redirects_to_login
 # ---------------------------------------------------------------------------
 
+
 class _RedirectResponse:
     """Minimal fake redirect response."""
+
     def __init__(self, status_code: int, location: str):
         self.status_code = status_code
         self._location = location
@@ -132,6 +137,7 @@ def test_should_fail_when_next_url_missing():
 # assert_form_error
 # ---------------------------------------------------------------------------
 
+
 class _FakeForm:
     def __init__(self, errors: dict):
         self.errors = errors
@@ -162,6 +168,7 @@ def test_should_fail_when_error_message_does_not_match():
 def test_should_fail_when_response_has_no_context():
     class _NoContext:
         context = None
+
     with pytest.raises(AssertionError, match="no context"):
         assert_form_error(_NoContext(), "email", "required")
 
@@ -169,5 +176,6 @@ def test_should_fail_when_response_has_no_context():
 def test_should_fail_when_form_not_in_context():
     class _EmptyContext:
         context = {}
+
     with pytest.raises(AssertionError, match="No 'form'"):
         assert_form_error(_EmptyContext(), "email", "required")

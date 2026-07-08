@@ -11,6 +11,7 @@ Available fixtures:
     drf_api_client   — unauthenticated DRF APIClient (if djangorestframework installed)
     drf_auth_client  — DRF APIClient authenticated as db_user
 """
+
 import pytest
 
 
@@ -18,6 +19,7 @@ import pytest
 def db_user(db):
     """A standard active user, saved to DB."""
     from iil_testkit.factories import UserFactory
+
     return UserFactory()
 
 
@@ -25,6 +27,7 @@ def db_user(db):
 def staff_user(db):
     """A staff user (is_staff=True), saved to DB."""
     from iil_testkit.factories import StaffUserFactory
+
     return StaffUserFactory()
 
 
@@ -32,6 +35,7 @@ def staff_user(db):
 def admin_user(db):
     """A superuser (is_staff=True, is_superuser=True), saved to DB."""
     from iil_testkit.factories import AdminUserFactory
+
     return AdminUserFactory()
 
 
@@ -39,6 +43,7 @@ def admin_user(db):
 def api_client():
     """Unauthenticated Django test Client."""
     from django.test import Client
+
     return Client()
 
 
@@ -46,6 +51,7 @@ def api_client():
 def auth_client(db_user):
     """Django test Client force-logged-in as db_user."""
     from django.test import Client
+
     client = Client()
     client.force_login(db_user)
     return client
@@ -55,6 +61,7 @@ def auth_client(db_user):
 def staff_client(staff_user):
     """Django test Client force-logged-in as staff_user."""
     from django.test import Client
+
     client = Client()
     client.force_login(staff_user)
     return client
@@ -69,6 +76,7 @@ def drf_api_client():
     """
     pytest.importorskip("rest_framework", reason="djangorestframework not installed")
     from rest_framework.test import APIClient
+
     return APIClient()
 
 
@@ -81,6 +89,7 @@ def drf_auth_client(db_user):
     """
     pytest.importorskip("rest_framework", reason="djangorestframework not installed")
     from rest_framework.test import APIClient
+
     client = APIClient()
     client.force_authenticate(user=db_user)
     return client
