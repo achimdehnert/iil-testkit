@@ -112,7 +112,9 @@ def assert_data_testids(response: HttpResponse, status_code: int = 200) -> None:
     _HTMX_ATTRS = ("hx-post", "hx-get", "hx-delete", "hx-put", "hx-patch")
     violations: list[str] = []
     for attr in _HTMX_ATTRS:
-        for el in soup.find_all(attrs={attr: True}):
+        # `name` muss positional als None mitgegeben werden, sonst greift die
+        # bs4-Ueberladung mit `attrs`-Woerterbuch nicht — semantisch identisch.
+        for el in soup.find_all(None, attrs={attr: True}):
             if not el.get("data-testid"):
                 tag_repr = f"<{el.name} {attr}={el[attr]!r}>"
                 violations.append(tag_repr)

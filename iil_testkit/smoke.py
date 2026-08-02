@@ -28,8 +28,24 @@ Usage (ViewSmokeTester mixin):
 from __future__ import annotations
 
 import re
+from typing import Any, Protocol
 
 __all__ = ["discover_smoke_urls", "ViewSmokeTester"]
+
+
+class _HatGet(Protocol):
+    """Das Wenige, das der Smoke-Test vom Test-Client wirklich braucht.
+
+    Vorher stand hier `client: object` plus ein `# type: ignore` am Aufruf.
+    Beides zusammen sagte: „ich weiß es nicht, prüf es nicht nach" — und der
+    Ignore-Code passte nicht einmal zum tatsächlichen Fehler. Ein Protokoll mit
+    genau einer Methode sagt stattdessen, **was** verlangt wird: irgendetwas,
+    das `get(url)` beherrscht. Der Django-Test-Client erfüllt das, jeder
+    Ersatz-Client ebenso, und niemand muss dafür importiert werden.
+    """
+
+    def get(self, path: str, *args: Any, **kwargs: Any) -> Any: ...
+
 
 _SKIP_NAMESPACES: frozenset[str] = frozenset(
     {"admin", "djdt", "silk", "debug", "media", "prometheus"}
@@ -128,7 +144,7 @@ class ViewSmokeTester:
     def discover(self) -> list[str]:
         return discover_smoke_urls(self.extra_skip_namespaces)
 
-    def run_smoke(self, client: object) -> None:
+    def run_smoke(self, client: _HatGet) -> None:
         """Run smoke tests for all discovered URLs.
 
         Args:
@@ -142,7 +158,7 @@ class ViewSmokeTester:
 
         failures: list[str] = []
         for url in urls:
-            response = client.get(url)  # type: ignore[union-attr]
+            response = client.get(url)
             if response.status_code not in self.expected_statuses:
                 failures.append(f"  {url}  → HTTP {response.status_code}")
 
