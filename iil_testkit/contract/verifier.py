@@ -45,7 +45,23 @@ class BaseContractVerifier(ABC):
     def assert_params(self, expected: list[str]) -> None: ...
 
     @abstractmethod
-    def assert_no_param(self, wrong_name: str) -> None: ...
+    def assert_no_param(self, *args: Any, **kwargs: Any) -> None:
+        """Prüft, dass ein bekannter Fehler-Parametername NICHT existiert.
+
+        **Die Signatur ist hier bewusst offen.** Die drei Verifier haben
+        unterschiedlich viele Freiheitsgrade: `CallableContractVerifier` und
+        `TaskContractVerifier` prüfen genau *eine* Funktion und brauchen nur den
+        falschen Namen; `ContractVerifier` prüft eine ganze Klasse und muss
+        zusätzlich wissen, **welche** Methode gemeint ist.
+
+        Die frühere Fassung schrieb `(self, wrong_name: str)` vor — eine
+        Signatur, die `ContractVerifier` nicht einhalten *kann*, ohne die Angabe
+        der Methode zu verlieren. Das war kein Fehler in der Unterklasse,
+        sondern einer in der Basis: Sie versprach einen gemeinsamen Aufruf, den
+        es nicht gibt. Die Basis fordert deshalb nur noch, **dass** es die
+        Methode gibt; die konkrete Signatur steht in der Unterklasse, und
+        Aufrufer arbeiten ohnehin mit dem konkreten Typ.
+        """
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -459,7 +475,10 @@ class TaskContractVerifier(BaseContractVerifier):
 
     @staticmethod
     def _get_task_name(task: Any) -> str:
-        return getattr(task, "name", None) or getattr(task, "__name__", str(task))
+        # `getattr` auf einem `Any` liefert `Any`, und der `or`-Ausdruck kann
+        # `None` durchreichen, wenn `name` gesetzt, aber leer ist. Das explizite
+        # `str()` macht die Zusage der Signatur wahr, statt sie nur zu behaupten.
+        return str(getattr(task, "name", None) or getattr(task, "__name__", None) or task)
 
     @staticmethod
     def _resolve_task_function(task: Any) -> Callable[..., Any]:
