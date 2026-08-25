@@ -174,7 +174,7 @@ def _innerhalb(pfad: Path, basis: Path) -> bool:
 
 
 def template_dateien(extra: Iterable[Path] = ()) -> list[Path]:
-    """Alle ``*.html`` aus ``TEMPLATES[*]['DIRS']`` + App-Template-Ordnern, nur innerhalb ``BASE_DIR``.
+    """Alle ``*.html`` aus ``TEMPLATES[*]['DIRS']`` und App-Template-Ordnern in ``BASE_DIR``.
 
     Was ausserhalb liegt (site-packages, ``django.contrib.*``), gehoert nicht dem
     Repo und wird nicht bewertet.
@@ -213,7 +213,7 @@ def python_dateien() -> list[Path]:
 
 
 def verlinkte_namen(dateien: Iterable[Path]) -> set[str]:
-    """Routennamen, auf die irgendein Template per ``{% url %}`` zeigt — jede Datei einmal gelesen."""
+    """Routennamen, auf die ein Template per ``{% url %}`` zeigt — jede Datei einmal gelesen."""
     namen: set[str] = set()
     for p in dateien:
         namen.update(_URL_TAG.findall(p.read_text(encoding="utf-8", errors="ignore")))
