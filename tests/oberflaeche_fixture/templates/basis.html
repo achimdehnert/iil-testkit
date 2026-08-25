@@ -1,0 +1,9 @@
+<!doctype html>
+<html>
+<body>
+  {# einzeilig ist erlaubt #}
+  <a href="{% url 'start' %}">Start</a>
+  <a href="{% url "angebote:liste" %}">Liste</a>
+  <form method="post" action="{% url 'senden' %}"><button>Senden</button></form>
+</body>
+</html>
