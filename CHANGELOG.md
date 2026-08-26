@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.6.0] — 2026-08-25
+
+- **Added**
+  - `iil_testkit.oberflaeche` — zwei Klassen-Gates aus ausschreibungs-hub (2026-08-24/25), exportiert und repo-agnostisch (platform#2326, KONZ-platform-051): `erreichbarkeit()` findet seitenrendernde Routen, auf die kein Template per `{% url %}` zeigt und die keine View per `redirect`/`reverse` ansteuert (Ausnahmen mit Grund, Fragmente per Muster); `mehrzeilige_kommentare()` findet `{# … #}` ueber Zeilenumbrueche, die Django woertlich ausgibt. Template-Verzeichnisse aus `TEMPLATES[*]['DIRS']` + `get_app_template_dirs`, begrenzt auf `BASE_DIR`; jede Datei wird einmal gelesen; `tests/`, `migrations/`, `management/` zaehlen nicht als Weg. Rechenkerne sind reine Funktionen mit eigener Positivkontrolle (`tests/test_oberflaeche.py`, Mini-Repo unter `tests/oberflaeche_fixture/`).
+
 ## [0.5.3] — 2026-05-14
 
 - **Fixed**
