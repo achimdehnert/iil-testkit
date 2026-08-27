@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.6.1] — 2026-08-27
+
+- **Changed**
+  - Publish laeuft per Trusted Publishing (OIDC) aus dem eigenen Repo (`publish.yml`, ADR-278) statt ueber den platform-seitigen Token-Publisher; keine Code-Aenderung. Beweis: PyPI-Provenance (Attestation) fuer 0.6.1 — platform KONZ-052 V1.
+
 ## [0.6.0] — 2026-08-25
 
 - **Added**
