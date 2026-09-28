@@ -40,4 +40,4 @@ Extras: `iil-testkit[dev]`, `iil-testkit[django]`, `iil-testkit[drf]`, `iil-test
 
 ## Release
 
-Kein publish-Workflow im Repo — Release-Pfad siehe platform `registry/pypi-fleet.yaml` (ADR-266).
+Publish via `publish.yml` (OIDC) — nie manuell (ADR-226/266; Release nur über CI).
